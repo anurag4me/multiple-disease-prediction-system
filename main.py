@@ -1,5 +1,7 @@
 import os
 import pickle
+import numpy as np
+from PIL import Image
 import streamlit as st
 from streamlit_option_menu import option_menu
 
@@ -17,15 +19,22 @@ diabetes_model = pickle.load(open(f'{working_dir}/saved_models/diabetes_model.sa
 heart_disease_model = pickle.load(open(f'{working_dir}/saved_models/heart_disease_model.sav', 'rb'))
 parkinsons_model = pickle.load(open(f'{working_dir}/saved_models/parkinsons_model.sav', 'rb'))
 
+# ── Load Brain Tumor deep-learning model (lazy import to keep startup fast) ─
+@st.cache_resource
+def load_brain_tumor_model():
+    from keras.models import load_model
+    return load_model(f'{working_dir}/saved_models/brain_tumor_model.keras')
+
 # ── Sidebar navigation ───────────────────────────────────────────────────────
 with st.sidebar:
     selected = option_menu(
         'Multiple Disease Prediction System',
-        ['Diabetes Prediction',
+        ['Brain Tumor Detection',
+         'Diabetes Prediction',
          'Heart Disease Prediction',
          "Parkinson's Prediction"],
         menu_icon='hospital-fill',
-        icons=['activity', 'heart', 'person'],
+        icons=['file-medical', 'activity', 'heart', 'person'],
         default_index=0
     )
 
@@ -145,3 +154,87 @@ if selected == "Parkinson's Prediction":
                                  else "The person does not have Parkinson's disease"
 
     st.success(parkinsons_diagnosis)
+
+# ── Brain Tumor Detection ───────────────────────────────────────────────────
+if selected == 'Brain Tumor Detection':
+    st.title('Brain Tumor Detection using Deep Learning')
+    st.write('Upload an MRI scan image and the model will classify the tumor type.')
+ 
+    # Class labels must match the order used during training
+    CLASS_LABELS = ['pituitary', 'glioma', 'notumor', 'meningioma']
+    IMAGE_SIZE   = 128  # Must match the size used during training
+ 
+    TUMOR_INFO = {
+        'pituitary':   ('Pituitary Tumor',   '🟠', 'A tumor that forms in the pituitary gland at the base of the brain.'),
+        'glioma':      ('Glioma',             '🔴', 'A tumor that starts in the glial cells of the brain or spinal cord.'),
+        'meningioma':  ('Meningioma',         '🟡', 'A tumor that arises from the meninges, the membranes surrounding the brain and spinal cord.'),
+        'notumor':     ('No Tumor Detected', '🟢', 'No signs of a brain tumor were found in the MRI scan.'),
+    }
+ 
+    uploaded_file = st.file_uploader(
+        'Choose an MRI image file',
+        type=['jpg', 'jpeg', 'png'],
+        help='Upload a brain MRI scan (JPG or PNG format)'
+    )
+ 
+    if uploaded_file is not None:
+        # Display the uploaded image
+        col1, col2 = st.columns([1, 1])
+ 
+        with col1:
+            st.subheader('Uploaded MRI Scan')
+            image = Image.open(uploaded_file).convert('RGB')
+            st.image(image, caption='Uploaded MRI Image', use_container_width=True)
+ 
+        with col2:
+            st.subheader('Prediction Result')
+ 
+            if st.button('Run Brain Tumor Detection'):
+                with st.spinner('Analysing MRI scan...'):
+                    # Preprocess image exactly as done in training
+                    img_resized  = image.resize((IMAGE_SIZE, IMAGE_SIZE))
+                    img_array    = np.array(img_resized) / 255.0          # Normalise
+                    img_array    = np.expand_dims(img_array, axis=0)      # Add batch dim
+ 
+                    # Load model and predict
+                    brain_model  = load_brain_tumor_model()
+                    predictions  = brain_model.predict(img_array)
+                    pred_index   = int(np.argmax(predictions, axis=1)[0])
+                    confidence   = float(np.max(predictions, axis=1)[0]) * 100
+                    pred_label   = CLASS_LABELS[pred_index]
+ 
+                    title, icon, description = TUMOR_INFO[pred_label]
+ 
+                    # ── Result card ──────────────────────────────────────
+                    if pred_label == 'notumor':
+                        st.success(f'{icon} **{title}**')
+                    else:
+                        st.error(f'{icon} **{title}**')
+ 
+                    st.metric(label='Confidence Score', value=f'{confidence:.2f}%')
+                    st.info(f'**About:** {description}')
+ 
+                    # ── Probability breakdown ────────────────────────────
+                    st.subheader('Class Probabilities')
+                    prob_data = {
+                        TUMOR_INFO[lbl][0]: float(predictions[0][i]) * 100
+                        for i, lbl in enumerate(CLASS_LABELS)
+                    }
+                    for label_name, prob in sorted(prob_data.items(), key=lambda x: -x[1]):
+                        st.progress(
+                            int(prob),
+                            text=f'{label_name}: {prob:.2f}%'
+                        )
+ 
+    else:
+        # Show placeholder / instructions when no image is uploaded
+        st.info('👆 Please upload a brain MRI scan image to get started.')
+ 
+        st.subheader('Detectable Tumor Types')
+        cols = st.columns(4)
+        for col, (key, (title, icon, desc)) in zip(cols, TUMOR_INFO.items()):
+            with col:
+                st.markdown(f'### {icon}')
+                st.markdown(f'**{title}**')
+                st.caption(desc)
+ 
