@@ -123,7 +123,7 @@ if selected == 'Dashboard':
         df_bc    = pd.DataFrame(bc.data, columns=bc.feature_names)
         df_bc['target']    = bc.target
         df_bc['diagnosis'] = df_bc['target'].map({1:'Benign', 0:'Malignant'})
-        lv_path  = os.path.join(working_dir, 'indian_liver_patient.csv')
+        lv_path  = os.path.join(working_dir, 'Liver Disease Prediction/indian_liver_patient.csv')
         df_liver = pd.read_csv(lv_path) if os.path.exists(lv_path) else pd.DataFrame()
         return df_diab, df_heart, df_park, df_bc, df_liver
 
