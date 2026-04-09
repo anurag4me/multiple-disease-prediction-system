@@ -128,7 +128,6 @@ if selected == 'Dashboard':
         return df_diab, df_heart, df_park, df_bc, df_liver
 
     df_diab, df_heart, df_park, df_bc, df_liver = get_datasets()
-    print(df_diab)
 
     kpis = [
         (len(df_diab)  if not df_diab.empty  else 768, "Diabetes Records"),
@@ -677,7 +676,6 @@ if selected == 'Health Chatbot':
             return text if text else "I couldn't generate a response. Please try again."
 
         except Exception as e:
-            print(e)
             return (
                 "⚠️ Could not reach the AI model. General health tips:\n\n"
                 "🩺 See a doctor for any persistent symptoms\n"
