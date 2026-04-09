@@ -1,61 +1,63 @@
-# Multiple Disease Prediction System
+# MedAI: Multiple Disease Prediction System
 
-This repository contains a Streamlit web application that leverages machine learning and deep learning to predict various diseases. The system provides a user-friendly interface for predicting Brain Tumors, Diabetes, Heart Disease, and Parkinson's Disease.
+This repository hosts MedAI, a comprehensive web application built with Streamlit that leverages machine learning and deep learning to predict a variety of diseases. The system provides a user-friendly interface for risk assessment, an analytics dashboard for data visualization, and an AI-powered health chatbot for preliminary symptom analysis.
 
 ## Features
 
-The application is organized into four distinct prediction modules:
+The MedAI application is modular, offering several distinct functionalities:
 
+*   **Health Analytics Dashboard:** Presents visual insights from the various medical datasets used for training the models, highlighting patterns, risk factors, and disease prevalence.
 *   **Brain Tumor Detection:** Classifies brain MRI scans into four categories: Glioma, Meningioma, Pituitary Tumor, or No Tumor.
-*   **Diabetes Prediction:** Predicts whether a person has diabetes based on various health metrics.
-*   **Heart Disease Prediction:** Predicts the presence of heart disease based on medical attributes.
-*   **Parkinson's Prediction:** Predicts the presence of Parkinson's disease based on specific voice measurements.
+*   **Breast Cancer Prediction:** Differentiates breast tumors as Malignant or Benign based on nucleus measurements from biopsy images.
+*   **Diabetes Prediction:** Assesses the risk of diabetes based on key health metrics like glucose levels, BMI, and age.
+*   **Heart Disease Prediction:** Predicts the presence of cardiovascular disease using clinical parameters.
+*   **Kidney Disease Prediction:** Predicts the likelihood of Chronic Kidney Disease (CKD) from blood and urine test results.
+*   **Liver Disease Prediction:** Evaluates the risk of liver disease based on liver function test (LFT) values.
+*   **Parkinson's Prediction:** Detects the presence of Parkinson's disease using specific voice measurements as biomarkers.
+*   **AI Health Chatbot:** An interactive chatbot that provides general health information based on user-described symptoms.
 
-## Models Used
+## Models & Technologies
 
-Different models are trained for each specific prediction task.
-
-1.  **Brain Tumor Detection (Deep Learning)**
-    *   **Model:** A Convolutional Neural Network (CNN) built using transfer learning with the VGG16 architecture.
-    *   **Framework:** TensorFlow/Keras.
-    *   **Details:** The model is trained on a dataset of brain MRI images. It processes an uploaded MRI scan and predicts the tumor type with an associated confidence score. The final model is saved as `brain_tumor_model.keras`.
-
-2.  **Diabetes, Heart Disease, and Parkinson's Prediction (Machine Learning)**
-    *   **Models:**
-        *   **Diabetes:** Support Vector Machine (SVM)
-        *   **Heart Disease:** Logistic Regression
-        *   **Parkinson's:** Support Vector Machine (SVM)
-    *   **Framework:** Scikit-learn.
-    *   **Details:** These models are trained on tabular datasets containing relevant medical features for each disease. The trained models are saved as `.sav` files using `pickle`.
-
-## Technologies Used
+A combination of machine learning and deep learning models is employed, each trained for a specific prediction task.
 
 *   **Web Framework:** Streamlit
+*   **Machine Learning:** Scikit-learn, Pandas, NumPy
 *   **Deep Learning:** TensorFlow, Keras
-*   **Machine Learning:** Scikit-learn
-*   **Data Manipulation:** Pandas, NumPy
+*   **Data Visualization:** Plotly
 *   **Image Processing:** Pillow
 
 ## Repository Structure
 
 ```
-├── main.py                          # Main Streamlit application file
-├── requirements.txt                 # Python dependencies
-├── saved_models/                    # Directory for pre-trained models
+.
+├── main.py                               # Main Streamlit application
+├── requirements.txt                      # Python dependencies
+├── saved_models/                         # Directory for all pre-trained models
 │   ├── brain_tumor_model.keras
+│   ├── breast_cancer_model.sav
 │   ├── diabetes_model.sav
 │   ├── heart_disease_model.sav
+│   ├── kidney_disease_model.sav
+│   ├── liver_disease_model.sav
 │   └── parkinsons_model.sav
-├── Brain Tumor Detection/             # Notebook and data for brain tumor model
+├── Brain Tumor Detection/
 │   ├── Brain Tumor Detection.ipynb
 │   └── MRI Images/
-├── Diabetes Prediction/               # Notebook and data for diabetes model
+├── Breast Cancer Prediction/
+│   └── breast_cancer_detection.ipynb
+├── Diabetes Prediction/
 │   ├── Diabetes Prediction.ipynb
 │   └── diabetes.csv
-├── Heart Disease Prediction/          # Notebook and data for heart disease model
+├── Heart Disease Prediction/
 │   ├── Heart Disease Prediction.ipynb
 │   └── heart.csv
-└── Parkinsons Disease Detection/      # Notebook and data for Parkinson's model
+├── Kidney Disease Prediction/
+│   ├── kidney_disease.csv
+│   └── kidney_disease_prediction.ipynb
+├── Liver Disease Prediction/
+│   ├── indian_liver_patient.csv
+│   └── liver_disease_prediction.ipynb
+└── Parkinsons Disease Detection/
     ├── Parkinson's Disease Detection.ipynb
     └── parkinsons.csv
 ```
@@ -70,13 +72,13 @@ To run this project locally, follow these steps:
     cd multiple-disease-prediction-system
     ```
 
-2.  **Create a virtual environment (recommended):**
+2.  **Create and activate a virtual environment (recommended):**
     ```bash
     python -m venv venv
     source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
     ```
 
-3.  **Install the dependencies:**
+3.  **Install the required dependencies:**
     ```bash
     pip install -r requirements.txt
     ```
@@ -85,17 +87,19 @@ To run this project locally, follow these steps:
     ```bash
     streamlit run main.py
     ```
-
-    The application will open in your default web browser.
+The application will automatically open in your default web browser.
 
 ## Usage
 
 1.  Navigate to the web application in your browser.
-2.  Use the sidebar to select the disease you want to predict.
-3.  **For Diabetes, Heart Disease, and Parkinson's:**
-    *   Enter the required medical parameters into the input fields.
-    *   Click the corresponding "Test Result" button to see the prediction.
+2.  Use the sidebar to navigate between the **Dashboard**, different **Disease Prediction** modules, and the **Health Chatbot**.
+3.  **For tabular data predictions** (Diabetes, Heart Disease, etc.):
+    *   Enter the required medical parameters in the input fields provided.
+    *   Click the "Predict" button to view the model's assessment.
 4.  **For Brain Tumor Detection:**
-    *   Upload an MRI scan image (`.jpg`, `.jpeg`, or `.png`), Additionally you can use Sample Images for testing from `/Brain Tumor Detection/MRI Images/Sample Testing Images/` Folder.
-    *   Click the "Run Brain Tumor Detection" button.
-    *   The application will display the uploaded image, the prediction result, a confidence score, and a breakdown of class probabilities.
+    *   Upload an MRI scan image (.jpg, .jpeg, or .png), Additionally you can use Sample Images for testing from /Brain Tumor Detection MRI Images/Sample Testing Images/ Folder.
+    *   Click the "Detect Tumour" button to process the image.
+    *   The application will display the prediction (tumor type or no tumor), along with a confidence score and class probabilities.
+5.  **For the AI Health Chatbot:**
+    *   Type your health questions or describe your symptoms in the chat input box.
+    *   The AI will provide general health information and suggest potential areas of concern.
